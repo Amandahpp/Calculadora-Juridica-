@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de Excesso de Execução</title>
+<style>
+:root{--bg:#f5f7f9;--card:#fff;--navy:#17324d;--navy2:#244d69;--gold:#c79a45;--text:#17212b;--muted:#667585;--line:#e4e9ee;--danger:#b42318;--dangerbg:#fff1f0;--ok:#18794e;--okbg:#ecfdf3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Arial,Helvetica,sans-serif}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:34px 22px}
+.header-inner{max-width:1180px;margin:auto}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:#d9b96d;font-weight:700}
+h1{margin:5px 0 7px;font-size:30px}
+header p{margin:0;color:#dce6ef;max-width:720px}
+.wrap{max-width:1180px;margin:auto;padding:26px 20px 50px;display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:21px;margin-bottom:17px;box-shadow:0 3px 14px rgba(20,45,65,.045)}
+.card h2{font-size:17px;margin:0 0 4px;color:var(--navy)}
+.hint{color:var(--muted);font-size:13px;margin:0 0 17px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}
+label{font-size:12px;color:var(--muted);font-weight:600;display:block}
+input{width:100%;margin-top:6px;padding:11px 12px;font:inherit;color:var(--text);border:1px solid #ccd5dd;border-radius:8px;background:#fbfcfd}
+input:focus{outline:3px solid rgba(199,154,69,.18);border-color:var(--gold)}
+.section-title{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.number{width:27px;height:27px;border-radius:50%;background:#edf3f7;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+.row{display:flex;gap:7px;margin-bottom:7px}.row input{margin:0}
+.btn{font:600 13px Arial;padding:10px 14px;border:1px solid var(--navy);background:#fff;color:var(--navy);border-radius:8px;cursor:pointer}
+.btn:hover{background:var(--navy);color:#fff}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#fff;padding:12px 22px}
+.btn.primary:hover{background:#ad8030}
+.btn.x{border-color:var(--line);color:var(--muted);padding:9px 11px}
+.action{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px}
+.sec{position:sticky;top:18px}
+.hero{background:linear-gradient(145deg,var(--navy),#244d69);color:#fff;border-radius:14px;padding:25px;margin-bottom:17px;box-shadow:0 7px 20px rgba(23,50,77,.14)}
+.hero small{color:#cbd9e5}.hero .big{font-size:34px;font-weight:800;color:#f0d28c;margin:4px 0 2px}
+.hero .label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#b9c9d6}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.steps li:last-child{border-bottom:0}
+.steps li span:first-child small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.steps li b{white-space:nowrap;color:var(--navy)}
+.al{padding:11px 13px;border-radius:8px;margin-top:9px;font-size:13px;border-left:4px solid #8996a3;background:#f5f7f9}
+.al.aviso{border-color:var(--danger);background:var(--dangerbg);color:#7a211b}
+.al.ok{border-color:var(--ok);background:var(--okbg);color:#17603f}
+textarea{width:100%;min-height:150px;font:13px/1.55 Arial;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fbfcfd;resize:vertical}
+.err{color:var(--danger)}
+.footer-note{font-size:11px;color:var(--muted);margin-top:13px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.sec{position:static}}
+@media(max-width:560px){h1{font-size:24px}.wrap{padding:18px 12px}.card{padding:16px}.hero .big{font-size:29px}}
+@media print{header,.left,.btn,.no-print{display:none!important}.wrap{display:block;padding:0}.sec{position:static}body{background:#fff}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header><div class="header-inner">
+<div class="eyebrow">Ferramenta de conferência</div>
+<h1>Calculadora de Excesso de Execução</h1>
+<p>Cálculo da parcela vencida, atualização pelo fator global do demonstrativo e conferências auxiliares da operação.</p>
+</div></header>
+
+<div class="wrap">
+<main class="left">
+<div class="card">
+<div class="section-title"><div class="number">1</div><div><h2>Parcela vencida</h2></div></div>
+<p class="hint">Critério utilizado: saldo devedor dividido pelas prestações ainda a pagar.</p>
+<div class="g">
+<label>Saldo devedor na data (R$)<input id="saldo" type="number" step="0.01" value="962587.02"></label>
+<label>Prestações a pagar<input id="n" type="number" min="1" value="4"></label>
+</div></div>
+
+<div class="card">
+<div class="section-title"><div class="number">2</div><div><h2>Valor executado</h2></div></div>
+<p class="hint">Informe o valor executado e as datas utilizadas no demonstrativo.</p>
+<div class="g">
+<label>Valor executado (R$)<input id="executado" type="number" step="0.01" value="1100736.56"></label>
+<label>Data do ajuizamento<input id="data_ajuizamento" type="date" value="2026-06-26"></label>
+<label>Data-base<input id="data_base" type="date" value="2026-07-17"></label>
+</div></div>
+
+<div class="card">
+<div class="section-title"><div class="number">3</div><div><h2>Conferências do demonstrativo</h2></div></div>
+<p class="hint">Dados usados para as conferências e alertas do cálculo.</p>
+<div class="g">
+<label>Capital utilizado (R$)<input id="capital" type="number" step="0.01" value="897459.30"></label>
+<label>“Valor da operação” (R$)<input id="cabecalho" type="number" step="0.01" value="1794918.60"></label>
+<label>Saldo antes das amortizações (R$)<input id="saldo_antes" type="number" step="0.01" value="1093289.46"></label>
+</div>
+<p class="hint" style="margin-top:19px;margin-bottom:8px">Amortizações</p>
+<div id="am"></div><button class="btn" onclick="addRow('am')">+ Adicionar amortização</button>
+<p class="hint" style="margin-top:19px;margin-bottom:8px">Lançamentos de seguro</p>
+<div id="sg"></div><button class="btn" onclick="addRow('sg')">+ Adicionar seguro</button>
+</div>
+</main>
+
+<aside class="sec">
+<div class="hero">
+<div class="label">Excesso de execução</div>
+<div class="big" id="excesso">—</div>
+<small id="pct"></small>
+</div>
+
+<div class="card">
+<h2>Memória de cálculo</h2>
+<ul class="steps" id="steps"></ul>
+<div id="alertas"></div>
+</div>
+
+<div class="card">
+<h2>Texto para a petição</h2>
+<p class="hint">Texto gerado automaticamente a partir dos valores informados.</p>
+<textarea id="texto" readonly></textarea>
+<div class="action">
+<button class="btn primary" onclick="copiar()" id="cp">Copiar texto</button>
+<button class="btn" onclick="window.print()">Imprimir</button>
+</div>
+<div class="footer-note">Os cálculos seguem a lógica implementada no arquivo de cálculo.</div>
+</div>
+</aside>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const brl=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const ids=['saldo','n','executado','capital','cabecalho','saldo_antes','data_ajuizamento','data_base'];
+const vals=id=>[...$(id).querySelectorAll('input')].map(i=>i.value);
+
+function addRow(id,v=''){
+const d=document.createElement('div');d.className='row';
+d.innerHTML='<input type="number" step="0.01" value="'+v+'" aria-label="valor"><button class="btn x" aria-label="remover">✕</button>';
+d.querySelector('input').oninput=agendar;
+d.querySelector('button').onclick=()=>{d.remove();agendar()};
+$(id).appendChild(d);agendar();
+}
+let t;function agendar(){clearTimeout(t);t=setTimeout(calcular,150)}
+
+async function calcular(){
+try{
+const body={amortizacoes:vals('am'),seguros:vals('sg')};
+ids.forEach(i=>body[i]=$(i).value);
+const r=await (await fetch('/api/calcular',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+if(r.erro){$('excesso').textContent='—';$('pct').textContent='';$('steps').innerHTML='';$('alertas').innerHTML='<div class="al aviso err">'+r.erro+'</div>';$('texto').value='';return}
+$('excesso').textContent=brl(r.excesso);
+$('pct').textContent=r.excesso_pct.toFixed(2).replace('.',',')+'% do valor executado';
+const s=(a,b,c)=>'<li><span>'+a+'<small>'+b+'</small></span><b>'+c+'</b></li>';
+$('steps').innerHTML=
+s('Parcela vencida','saldo ÷ prestações',brl(r.parcela))+
+s('Fator de atualização','executado ÷ saldo',r.fator.toFixed(6).replace('.',','))+
+s('Parcela atualizada','exigível subsidiário',brl(r.atualizada))+
+s('Total de amortizações','',brl(r.total_amortizacoes))+
+s('Saldo após amortizações','',brl(r.saldo_pos_amortizacoes))+
+s('Total de seguros','',brl(r.total_seguros))+
+(r.cabecalho_sobre_capital?s('Cabeçalho ÷ capital','',r.cabecalho_sobre_capital.toFixed(4).replace('.',',')+'×'):'');
+$('alertas').innerHTML=r.alertas.map(a=>'<div class="al '+a.tipo+'">'+a.texto+'</div>').join('');
+$('texto').value=r.texto;
+}catch(e){$('alertas').innerHTML='<div class="al aviso">Não foi possível calcular. Verifique se o servidor Flask está em execução.</div>'}
+}
+async function copiar(){
+await navigator.clipboard.writeText($('texto').value);
+$('cp').textContent='Copiado ✓';
+setTimeout(()=>$('cp').textContent='Copiar texto',1500)
+}
+ids.forEach(i=>$(i).oninput=agendar);
+[24533.68,179491.86,24805.20,4411.56].forEach(v=>addRow('am',v));
+</script>
+</body>
+</html>
